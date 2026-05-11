@@ -1,8 +1,15 @@
+require("dotenv").config();
+
 const express = require("express");
 
 const routes = require("./routes");
 
 const app = express();
+
+if (!process.env.OPENAI_API_KEY) {
+  console.log("OPENAI_API_KEY missing");
+  process.exit(1);
+}
 
 app.use(express.json());
 
