@@ -4,6 +4,10 @@ const express = require("express");
 
 const routes = require("./routes");
 
+const {
+  requestLogger
+} = require("./middleware");
+
 const app = express();
 
 if (!process.env.OPENAI_API_KEY) {
@@ -12,6 +16,8 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 app.use(express.json());
+
+app.use(requestLogger);
 
 app.use(routes);
 
