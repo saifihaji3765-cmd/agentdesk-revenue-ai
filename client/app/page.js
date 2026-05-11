@@ -29,7 +29,7 @@ export default function Home() {
       setLoading(true);
 
       const response = await fetch(
-        "https://your-render-url.onrender.com/api/proposal",
+        "https://agentdesk-revenue-ai-1.onrender.com",
         {
           method: "POST",
           headers: {
