@@ -26,17 +26,19 @@ const generateProposal = async (req, res) => {
       projectType,
       budget
     } = req.body;
-if (
-  !clientName ||
-  !businessType ||
-  !projectType ||
-  !budget
-) {
-  return res.status(400).json({
-    success: false,
-    message: "All fields are required"
-  });
-}
+
+    if (
+      !clientName ||
+      !businessType ||
+      !projectType ||
+      !budget
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required"
+      });
+    }
+
     const prompt = `
 Generate a professional business proposal.
 
