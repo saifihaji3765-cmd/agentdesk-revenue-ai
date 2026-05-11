@@ -4,10 +4,58 @@ import { useState } from "react";
 
 export default function Home() {
 
-  const [clientName, setClientName] = useState("");
-  const [businessType, setBusinessType] = useState("");
-  const [projectType, setProjectType] = useState("");
-  const [budget, setBudget] = useState("");
+  const [clientName, setClientName] =
+    useState("");
+
+  const [businessType, setBusinessType] =
+    useState("");
+
+  const [projectType, setProjectType] =
+    useState("");
+
+  const [budget, setBudget] =
+    useState("");
+
+  const [proposal, setProposal] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const generateProposal = async () => {
+
+    try {
+
+      setLoading(true);
+
+      const response = await fetch(
+        "https://your-render-url.onrender.com/api/proposal",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            clientName,
+            businessType,
+            projectType,
+            budget
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        setProposal(data.proposal);
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+
+    setLoading(false);
+  };
 
   return (
     <main
@@ -28,7 +76,11 @@ export default function Home() {
         }}
       >
 
-        <div style={{ marginBottom: "50px" }}>
+        <div
+          style={{
+            marginBottom: "50px"
+          }}
+        >
 
           <h1
             style={{
@@ -67,7 +119,8 @@ export default function Home() {
           <div
             style={{
               background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              border:
+                "1px solid rgba(255,255,255,0.08)",
               borderRadius: "24px",
               padding: "30px",
               backdropFilter: "blur(12px)",
@@ -96,43 +149,77 @@ export default function Home() {
               <input
                 placeholder="Client Name"
                 value={clientName}
-                onChange={(e) => setClientName(e.target.value)}
+                onChange={(e) =>
+                  setClientName(e.target.value)
+                }
                 style={inputStyle}
               />
 
               <input
                 placeholder="Business Type"
                 value={businessType}
-                onChange={(e) => setBusinessType(e.target.value)}
+                onChange={(e) =>
+                  setBusinessType(e.target.value)
+                }
                 style={inputStyle}
               />
 
               <input
                 placeholder="Project Type"
                 value={projectType}
-                onChange={(e) => setProjectType(e.target.value)}
+                onChange={(e) =>
+                  setProjectType(e.target.value)
+                }
                 style={inputStyle}
               />
 
               <input
                 placeholder="Budget"
                 value={budget}
-                onChange={(e) => setBudget(e.target.value)}
+                onChange={(e) =>
+                  setBudget(e.target.value)
+                }
                 style={inputStyle}
               />
 
-              <button style={buttonStyle}>
-                Generate AI Proposal
+              <button
+                style={buttonStyle}
+                onClick={generateProposal}
+              >
+                {
+                  loading
+                    ? "Generating..."
+                    : "Generate AI Proposal"
+                }
               </button>
 
             </div>
+
+            {
+              proposal && (
+                <div
+                  style={{
+                    marginTop: "25px",
+                    background:
+                      "rgba(255,255,255,0.05)",
+                    padding: "25px",
+                    borderRadius: "18px",
+                    whiteSpace: "pre-wrap",
+                    lineHeight: "1.7"
+                  }}
+                >
+                  {proposal}
+                </div>
+              )
+            }
 
           </div>
 
           <div
             style={{
               background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              border:
+                "1px solid rgba(255,255,255,0.08)",
               borderRadius: "24px",
               padding: "30px",
               backdropFilter: "blur(12px)",
@@ -218,8 +305,10 @@ function FeatureCard({ title, text }) {
 const inputStyle = {
   padding: "16px",
   borderRadius: "14px",
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(255,255,255,0.06)",
+  border:
+    "1px solid rgba(255,255,255,0.1)",
+  background:
+    "rgba(255,255,255,0.06)",
   color: "white",
   fontSize: "16px",
   outline: "none"
