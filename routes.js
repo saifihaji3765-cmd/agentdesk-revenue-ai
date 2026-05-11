@@ -1,19 +1,14 @@
 const express = require("express");
 
+const {
+  getApiStatus,
+  getHealthStatus
+} = require("./controllers");
+
 const router = express.Router();
 
-router.get("/api", (req, res) => {
-  res.json({
-    success: true,
-    message: "AgentDesk API Running"
-  });
-});
+router.get("/api", getApiStatus);
 
-router.get("/api/health", (req, res) => {
-  res.json({
-    status: "healthy",
-    server: "online"
-  });
-});
+router.get("/api/health", getHealthStatus);
 
 module.exports = router;
