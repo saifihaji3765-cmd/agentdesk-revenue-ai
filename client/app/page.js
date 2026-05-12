@@ -19,6 +19,43 @@ export default function Home() {
   const [faq, setFaq] =
     useState("");
 
+  const [message, setMessage] =
+    useState("");
+
+  const saveTraining = async () => {
+
+    try {
+
+      const response = await fetch(
+        "https://agentdesk-revenue-ai.onrender.com/api/training",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            businessName,
+            businessType,
+            services,
+            pricing,
+            faq
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage(
+          "AI Training Saved Successfully"
+        );
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <main
       style={{
@@ -126,9 +163,24 @@ export default function Home() {
 
             <button
               style={buttonStyle}
+              onClick={saveTraining}
             >
               Save AI Training
             </button>
+
+            {
+              message && (
+                <p
+                  style={{
+                    marginTop: "10px",
+                    color: "#4ade80",
+                    fontSize: "18px"
+                  }}
+                >
+                  {message}
+                </p>
+              )
+            }
 
           </div>
 
