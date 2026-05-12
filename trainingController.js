@@ -1,4 +1,4 @@
-const trainingData = [];
+const fs = require("fs");
 
 const saveTraining = async (req, res) => {
 
@@ -22,6 +22,13 @@ const saveTraining = async (req, res) => {
       });
     }
 
+    const rawData = fs.readFileSync(
+      "data.json"
+    );
+
+    const trainingData =
+      JSON.parse(rawData);
+
     const businessProfile = {
       id: Date.now(),
       businessName,
@@ -31,15 +38,29 @@ const saveTraining = async (req, res) => {
       faq
     };
 
-    trainingData.push(businessProfile);
+    trainingData.push(
+      businessProfile
+    );
+
+    fs.writeFileSync(
+      "data.json",
+      JSON.stringify(
+        trainingData,
+        null,
+        2
+      )
+    );
 
     res.json({
       success: true,
-      message: "AI training saved",
+      message:
+        "AI training saved successfully",
       data: businessProfile
     });
 
   } catch (error) {
+
+    console.log(error);
 
     res.status(500).json({
       success: false,
