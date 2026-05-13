@@ -38,6 +38,11 @@ export default function Home() {
   ] = useState("");
 
   const [
+    qrCode,
+    setQrCode
+  ] = useState("");
+
+  const [
     leads,
     setLeads
   ] = useState([]);
@@ -214,9 +219,22 @@ export default function Home() {
 
         if (data.success) {
 
-          setMessage(
-            "Scan QR Code In Render Logs"
-          );
+          if (data.qr) {
+
+            setQrCode(
+              data.qr
+            );
+
+            setMessage(
+              "Scan QR Code"
+            );
+
+          } else {
+
+            setMessage(
+              "WhatsApp Connected"
+            );
+          }
         }
 
       } catch (error) {
@@ -491,6 +509,25 @@ export default function Home() {
               >
                 Connect WhatsApp
               </button>
+
+              {
+
+                qrCode && (
+
+                  <img
+                    src={qrCode}
+
+                    alt="QR Code"
+
+                    style={{
+                      width: "260px",
+
+                      borderRadius: "20px"
+                    }}
+                  />
+
+                )
+              }
 
               {
 
