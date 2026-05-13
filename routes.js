@@ -14,6 +14,10 @@ const {
   getLeads
 } = require("./leadController");
 
+const {
+  getAlerts
+} = require("./alertController");
+
 const router = express.Router();
 
 router.get(
@@ -39,6 +43,11 @@ router.post(
 router.get(
   "/api/leads",
   getLeads
+);
+
+router.get(
+  "/api/alerts",
+  getAlerts
 );
 
 module.exports = router;
