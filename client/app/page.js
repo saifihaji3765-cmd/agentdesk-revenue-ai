@@ -35,9 +35,15 @@ export default function Home() {
     setLeads] =
     useState([]);
 
+  const [alerts,
+    setAlerts] =
+    useState([]);
+
   useEffect(() => {
 
     fetchLeads();
+
+    fetchAlerts();
 
   }, []);
 
@@ -58,6 +64,33 @@ export default function Home() {
 
           setLeads(
             data.leads
+          );
+        }
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+    };
+
+  const fetchAlerts =
+    async () => {
+
+      try {
+
+        const response =
+          await fetch(
+            "https://agentdesk-revenue-ai.onrender.com/api/alerts"
+          );
+
+        const data =
+          await response.json();
+
+        if (data.success) {
+
+          setAlerts(
+            data.alerts
           );
         }
 
@@ -123,7 +156,7 @@ export default function Home() {
 
       <div
         style={{
-          maxWidth: "1200px",
+          maxWidth: "1400px",
           margin: "0 auto"
         }}
       >
@@ -144,14 +177,14 @@ export default function Home() {
             marginBottom: "40px"
           }}
         >
-          Train your AI employee and manage leads.
+          Train your AI employee and monitor leads.
         </p>
 
         <div
           style={{
             display: "grid",
             gridTemplateColumns:
-              "1fr 1fr",
+              "1fr 1fr 1fr",
             gap: "30px"
           }}
         >
@@ -276,14 +309,7 @@ export default function Home() {
 
                     <div
                       key={lead.id}
-                      style={{
-                        background:
-                          "rgba(255,255,255,0.05)",
-                        padding:
-                          "18px",
-                        borderRadius:
-                          "14px"
-                      }}
+                      style={leadBox}
                     >
 
                       <p>
@@ -295,6 +321,70 @@ export default function Home() {
                       <p>
                         💬 {
                           lead.message
+                        }
+                      </p>
+
+                    </div>
+                  )
+                )
+              }
+
+            </div>
+
+          </div>
+
+          <div
+            style={cardStyle}
+          >
+
+            <h2
+              style={titleStyle}
+            >
+              Hot Lead Alerts
+            </h2>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection:
+                  "column",
+                gap: "15px"
+              }}
+            >
+
+              {
+                alerts.map(
+                  (alert) => (
+
+                    <div
+                      key={alert.id}
+                      style={{
+                        background:
+                          "rgba(239,68,68,0.15)",
+                        padding:
+                          "18px",
+                        borderRadius:
+                          "14px",
+                        border:
+                          "1px solid rgba(239,68,68,0.3)"
+                      }}
+                    >
+
+                      <p>
+                        🚨 {
+                          alert.status
+                        }
+                      </p>
+
+                      <p>
+                        📞 {
+                          alert.phone
+                        }
+                      </p>
+
+                      <p>
+                        💬 {
+                          alert.message
                         }
                       </p>
 
@@ -327,7 +417,7 @@ const cardStyle = {
 };
 
 const titleStyle = {
-  fontSize: "30px",
+  fontSize: "28px",
   marginBottom: "25px"
 };
 
@@ -372,4 +462,11 @@ const buttonStyle = {
   fontSize: "18px",
   fontWeight: "bold",
   cursor: "pointer"
+};
+
+const leadBox = {
+  background:
+    "rgba(255,255,255,0.05)",
+  padding: "18px",
+  borderRadius: "14px"
 };
