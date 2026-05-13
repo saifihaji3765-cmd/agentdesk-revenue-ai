@@ -1,6 +1,9 @@
 const fs = require("fs");
 
-const saveTraining = async (req, res) => {
+const saveTraining = async (
+  req,
+  res
+) => {
 
   try {
 
@@ -12,50 +15,58 @@ const saveTraining = async (req, res) => {
       faq
     } = req.body;
 
-    if (
-      !businessName ||
-      !businessType
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing fields"
-      });
-    }
+    const rawData =
+      fs.readFileSync(
+        "data.json"
+      );
 
-    const rawData = fs.readFileSync(
-      "data.json"
-    );
-
-    const trainingData =
+    const database =
       JSON.parse(rawData);
 
+    const businessId =
+      Date.now().toString();
+
     const businessProfile = {
-      id: Date.now(),
+
+      businessId,
+
       businessName,
+
       businessType,
+
       services,
+
       pricing,
+
       faq
+
     };
 
-    trainingData.push(
+    database.businesses.push(
       businessProfile
     );
 
     fs.writeFileSync(
+
       "data.json",
+
       JSON.stringify(
-        trainingData,
+        database,
         null,
         2
       )
+
     );
 
     res.json({
+
       success: true,
-      message:
-        "AI training saved successfully",
-      data: businessProfile
+
+      businessId,
+
+      business:
+        businessProfile
+
     });
 
   } catch (error) {
@@ -63,8 +74,9 @@ const saveTraining = async (req, res) => {
     console.log(error);
 
     res.status(500).json({
-      success: false,
-      message: "Server error"
+
+      success: false
+
     });
 
   }
