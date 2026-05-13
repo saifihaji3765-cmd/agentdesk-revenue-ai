@@ -18,6 +18,10 @@ const {
   getAlerts
 } = require("./alertController");
 
+const {
+  loginBusiness
+} = require("./authController");
+
 const router = express.Router();
 
 router.get(
@@ -38,6 +42,11 @@ router.post(
 router.post(
   "/api/training",
   saveTraining
+);
+
+router.post(
+  "/api/login",
+  loginBusiness
 );
 
 router.get(
