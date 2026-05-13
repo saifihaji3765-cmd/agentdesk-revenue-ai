@@ -4,7 +4,9 @@ const qrcode = require(
   "qrcode-terminal"
 );
 
-const OpenAI = require("openai");
+const OpenAI = require(
+  "openai"
+);
 
 const {
   Client,
@@ -18,184 +20,215 @@ const openai = new OpenAI({
     process.env.OPENAI_API_KEY
 });
 
-const client = new Client({
-
-  authStrategy:
-    new LocalAuth()
-
-});
+const clients = {};
 
 const chatMemory = {};
 
 const followupSent = {};
 
-client.on(
-  "qr",
-  (qr) => {
+const createWhatsAppSession =
+  (businessId) => {
 
-    qrcode.generate(
-      qr,
-      {
-        small: true
-      }
-    );
+    const client =
+      new Client({
 
-    console.log(
-      "Scan QR Code"
-    );
-  }
-);
-
-client.on(
-  "ready",
-  () => {
-
-    console.log(
-      "WhatsApp Connected"
-    );
-  }
-);
-
-client.on(
-  "message",
-  async (message) => {
-
-    try {
-
-      const rawData =
-        fs.readFileSync(
-          "data.json"
-        );
-
-      const database =
-        JSON.parse(rawData);
-
-      const business =
-        database.businesses[0];
-
-      if (!business) {
-
-        return message.reply(
-          "AI not trained yet."
-        );
-      }
-
-      const businessId =
-        business.businessId;
-
-      const userId =
-        message.from;
-
-      if (!chatMemory[userId]) {
-
-        chatMemory[userId] = [];
-      }
-
-      chatMemory[userId].push({
-
-        role: "user",
-
-        content:
-          message.body
+        authStrategy:
+          new LocalAuth({
+            clientId:
+              businessId
+          })
 
       });
 
-      const lowerMessage =
-        message.body.toLowerCase();
+    clients[businessId] =
+      client;
 
-      const triggerWords = [
+    client.on(
+      "qr",
+      (qr) => {
 
-        "price",
-        "interested",
-        "buy",
-        "booking",
-        "appointment"
-
-      ];
-
-      const isHotLead =
-        triggerWords.some(
-          (word) =>
-            lowerMessage.includes(
-              word
-            )
+        qrcode.generate(
+          qr,
+          {
+            small: true
+          }
         );
 
-      if (isHotLead) {
-
-        const rawLeads =
-          fs.readFileSync(
-            "leads.json"
-          );
-
-        const leadDatabase =
-          JSON.parse(rawLeads);
-
-        leadDatabase.leads.push({
-
-          id: Date.now(),
-
-          businessId,
-
-          phone:
-            message.from,
-
-          message:
-            message.body
-
-        });
-
-        fs.writeFileSync(
-
-          "leads.json",
-
-          JSON.stringify(
-            leadDatabase,
-            null,
-            2
-          )
-
-        );
-
-        const rawAlerts =
-          fs.readFileSync(
-            "alerts.json"
-          );
-
-        const alertDatabase =
-          JSON.parse(rawAlerts);
-
-        alertDatabase.alerts.push({
-
-          id: Date.now(),
-
-          businessId,
-
-          phone:
-            message.from,
-
-          message:
-            message.body,
-
-          status:
-            "HOT LEAD"
-
-        });
-
-        fs.writeFileSync(
-
-          "alerts.json",
-
-          JSON.stringify(
-            alertDatabase,
-            null,
-            2
-          )
-
+        console.log(
+          `Scan QR for ${businessId}`
         );
       }
+    );
 
-      const systemPrompt = `
+    client.on(
+      "ready",
+      () => {
+
+        console.log(
+          `WhatsApp Ready: ${businessId}`
+        );
+      }
+    );
+
+    client.on(
+      "message",
+      async (message) => {
+
+        try {
+
+          const rawData =
+            fs.readFileSync(
+              "data.json"
+            );
+
+          const database =
+            JSON.parse(
+              rawData
+            );
+
+          const business =
+            database.businesses.find(
+
+              (item) =>
+
+                item.businessId ===
+                businessId
+
+            );
+
+          if (!business) {
+
+            return message.reply(
+              "Business not found."
+            );
+          }
+
+          const userId =
+            message.from;
+
+          const memoryKey =
+            `${businessId}_${userId}`;
+
+          if (
+            !chatMemory[memoryKey]
+          ) {
+
+            chatMemory[
+              memoryKey
+            ] = [];
+          }
+
+          chatMemory[
+            memoryKey
+          ].push({
+
+            role: "user",
+
+            content:
+              message.body
+
+          });
+
+          const lowerMessage =
+            message.body.toLowerCase();
+
+          const triggerWords = [
+
+            "price",
+            "interested",
+            "buy",
+            "booking",
+            "appointment"
+
+          ];
+
+          const isHotLead =
+            triggerWords.some(
+              (word) =>
+                lowerMessage.includes(
+                  word
+                )
+            );
+
+          if (isHotLead) {
+
+            const rawLeads =
+              fs.readFileSync(
+                "leads.json"
+              );
+
+            const leadDatabase =
+              JSON.parse(
+                rawLeads
+              );
+
+            leadDatabase.leads.push({
+
+              id: Date.now(),
+
+              businessId,
+
+              phone:
+                message.from,
+
+              message:
+                message.body
+
+            });
+
+            fs.writeFileSync(
+
+              "leads.json",
+
+              JSON.stringify(
+                leadDatabase,
+                null,
+                2
+              )
+
+            );
+
+            const rawAlerts =
+              fs.readFileSync(
+                "alerts.json"
+              );
+
+            const alertDatabase =
+              JSON.parse(
+                rawAlerts
+              );
+
+            alertDatabase.alerts.push({
+
+              id: Date.now(),
+
+              businessId,
+
+              phone:
+                message.from,
+
+              message:
+                message.body,
+
+              status:
+                "HOT LEAD"
+
+            });
+
+            fs.writeFileSync(
+
+              "alerts.json",
+
+              JSON.stringify(
+                alertDatabase,
+                null,
+                2
+              )
+
+            );
+          }
+
+          const systemPrompt = `
 You are a professional AI employee.
 
 Business Name:
@@ -213,94 +246,134 @@ ${business.pricing}
 FAQ:
 ${business.faq}
 
-Reply professionally.
+Your goals:
+- Reply professionally
+- Convert customers
+- Capture leads
+- Encourage booking
 `;
 
-      const completion =
-        await openai.chat.completions.create({
+          const completion =
+            await openai.chat.completions.create({
 
-          model:
-            "gpt-4.1-mini",
+              model:
+                "gpt-4.1-mini",
 
-          messages: [
+              messages: [
 
-            {
-              role: "system",
+                {
+                  role:
+                    "system",
 
-              content:
-                systemPrompt
-            },
+                  content:
+                    systemPrompt
+                },
 
-            ...chatMemory[userId]
+                ...chatMemory[
+                  memoryKey
+                ]
 
-          ]
+              ]
 
-        });
+            });
 
-      const aiReply =
-        completion
-          .choices[0]
-          .message.content;
+          const aiReply =
+            completion
+              .choices[0]
+              .message.content;
 
-      chatMemory[userId].push({
+          chatMemory[
+            memoryKey
+          ].push({
 
-        role:
-          "assistant",
+            role:
+              "assistant",
 
-        content:
-          aiReply
+            content:
+              aiReply
 
-      });
+          });
 
-      await message.reply(
-        aiReply
-      );
+          await message.reply(
+            aiReply
+          );
 
-      if (
-        !followupSent[userId]
-      ) {
+          const followupKey =
+            `${businessId}_${userId}`;
 
-        followupSent[userId] =
-          true;
+          if (
+            !followupSent[
+              followupKey
+            ]
+          ) {
 
-        setTimeout(
+            followupSent[
+              followupKey
+            ] = true;
 
-          async () => {
+            setTimeout(
 
-            try {
+              async () => {
 
-              await client.sendMessage(
+                try {
 
-                userId,
+                  await client.sendMessage(
 
-                `Hello 👋
+                    userId,
 
-Just checking if you are still interested.`
+                    `Hello 👋
 
-              );
+Just checking if you are still interested.
 
-            } catch (error) {
+Let me know if you would like more details.`
 
-              console.log(error);
+                  );
 
-            }
+                } catch (error) {
 
-          },
+                  console.log(
+                    error
+                  );
 
-          7200000
+                }
 
-        );
+              },
+
+              7200000
+
+            );
+          }
+
+        } catch (error) {
+
+          console.log(error);
+
+          message.reply(
+            "AI error occurred."
+          );
+        }
       }
+    );
 
-    } catch (error) {
+    client.initialize();
 
-      console.log(error);
+    return client;
+  };
 
-      message.reply(
-        "AI error occurred."
-      );
-    }
+const rawData =
+  fs.readFileSync(
+    "data.json"
+  );
+
+const database =
+  JSON.parse(rawData);
+
+database.businesses.forEach(
+  (business) => {
+
+    createWhatsAppSession(
+      business.businessId
+    );
+
   }
 );
-
-client.initialize();
