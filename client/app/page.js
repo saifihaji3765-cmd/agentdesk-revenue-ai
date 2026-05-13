@@ -179,6 +179,53 @@ export default function Home() {
       }
     };
 
+  const connectWhatsApp =
+    async () => {
+
+      try {
+
+        if (!loggedBusiness) {
+          return;
+        }
+
+        const response =
+          await fetch(
+            "https://agentdesk-revenue-ai.onrender.com/api/connect-whatsapp",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+
+                businessId:
+                  loggedBusiness.businessId
+
+              })
+
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (data.success) {
+
+          setMessage(
+            "Scan QR Code In Render Logs"
+          );
+        }
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+    };
+
   const saveTraining =
     async () => {
 
@@ -433,6 +480,16 @@ export default function Home() {
                 }
               >
                 Activate AI Employee
+              </button>
+
+              <button
+                style={buttonStyle}
+
+                onClick={
+                  connectWhatsApp
+                }
+              >
+                Connect WhatsApp
               </button>
 
               {
