@@ -27,6 +27,8 @@ const client = new Client({
 
 const chatMemory = {};
 
+const followupSent = {};
+
 client.on(
   "qr",
   (qr) => {
@@ -185,6 +187,42 @@ Your goal:
       await message.reply(
         aiReply
       );
+
+      if (
+        !followupSent[userId]
+      ) {
+
+        followupSent[userId] =
+          true;
+
+        setTimeout(
+          async () => {
+
+            try {
+
+              await client.sendMessage(
+
+                userId,
+
+                `Hello 👋
+
+Just checking if you are still interested.
+
+Let me know if you would like more details.`
+
+              );
+
+            } catch (error) {
+
+              console.log(error);
+
+            }
+
+          },
+
+          7200000
+        );
+      }
 
     } catch (error) {
 
