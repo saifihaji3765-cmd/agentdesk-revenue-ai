@@ -7,57 +7,82 @@ import {
 
 export default function Home() {
 
-  const [businessName,
-    setBusinessName] =
-    useState("");
+  const [
+    businessName,
+    setBusinessName
+  ] = useState("");
 
-  const [businessType,
-    setBusinessType] =
-    useState("");
+  const [
+    businessType,
+    setBusinessType
+  ] = useState("");
 
-  const [services,
-    setServices] =
-    useState("");
+  const [
+    services,
+    setServices
+  ] = useState("");
 
-  const [pricing,
-    setPricing] =
-    useState("");
+  const [
+    pricing,
+    setPricing
+  ] = useState("");
 
-  const [faq,
-    setFaq] =
-    useState("");
+  const [
+    faq,
+    setFaq
+  ] = useState("");
 
-  const [message,
-    setMessage] =
-    useState("");
+  const [
+    message,
+    setMessage
+  ] = useState("");
 
-  const [leads,
-    setLeads] =
-    useState([]);
+  const [
+    leads,
+    setLeads
+  ] = useState([]);
 
-  const [alerts,
-    setAlerts] =
-    useState([]);
+  const [
+    alerts,
+    setAlerts
+  ] = useState([]);
+
+  const [
+    loggedBusiness,
+    setLoggedBusiness
+  ] = useState(null);
 
   useEffect(() => {
 
-  fetchLeads();
+    const savedBusiness =
+      localStorage.getItem(
+        "business"
+      );
 
-  fetchAlerts();
+    if (savedBusiness) {
 
-  const interval =
-    setInterval(() => {
+      setLoggedBusiness(
+        JSON.parse(savedBusiness)
+      );
+    }
 
-      fetchLeads();
+    fetchLeads();
 
-      fetchAlerts();
+    fetchAlerts();
 
-    }, 5000);
+    const interval =
+      setInterval(() => {
 
-  return () =>
-    clearInterval(interval);
+        fetchLeads();
 
-}, []);
+        fetchAlerts();
+
+      }, 5000);
+
+    return () =>
+      clearInterval(interval);
+
+  }, []);
 
   const fetchLeads =
     async () => {
@@ -123,17 +148,26 @@ export default function Home() {
             "https://agentdesk-revenue-ai.onrender.com/api/training",
             {
               method: "POST",
+
               headers: {
                 "Content-Type":
                   "application/json"
               },
+
               body: JSON.stringify({
+
                 businessName,
+
                 businessType,
+
                 services,
+
                 pricing,
+
                 faq
+
               })
+
             }
           );
 
@@ -143,7 +177,19 @@ export default function Home() {
         if (data.success) {
 
           setMessage(
-            "AI Training Saved Successfully"
+            "AI Employee Ready"
+          );
+
+          setLoggedBusiness(
+            data.business
+          );
+
+          localStorage.setItem(
+            "business",
+
+            JSON.stringify(
+              data.business
+            )
           );
         }
 
@@ -155,13 +201,18 @@ export default function Home() {
     };
 
   return (
+
     <main
       style={{
         minHeight: "100vh",
+
         background:
           "linear-gradient(to bottom right, #020617, #0f172a)",
+
         color: "white",
+
         padding: "40px",
+
         fontFamily: "Arial"
       }}
     >
@@ -169,6 +220,7 @@ export default function Home() {
       <div
         style={{
           maxWidth: "1400px",
+
           margin: "0 auto"
         }}
       >
@@ -176,6 +228,7 @@ export default function Home() {
         <h1
           style={{
             fontSize: "52px",
+
             marginBottom: "15px"
           }}
         >
@@ -185,102 +238,164 @@ export default function Home() {
         <p
           style={{
             opacity: 0.7,
+
             fontSize: "20px",
+
             marginBottom: "40px"
           }}
         >
-          Train your AI employee and monitor leads.
+          WhatsApp AI automation platform
+          for businesses.
         </p>
+
+        {
+
+          loggedBusiness && (
+
+            <div
+              style={{
+                background:
+                  "rgba(34,197,94,0.15)",
+
+                border:
+                  "1px solid rgba(34,197,94,0.3)",
+
+                padding: "20px",
+
+                borderRadius: "18px",
+
+                marginBottom: "30px"
+              }}
+            >
+
+              <h2>
+                ✅ AI Employee Active
+              </h2>
+
+              <p>
+                Business:
+                {" "}
+                {
+                  loggedBusiness.businessName
+                }
+              </p>
+
+              <p>
+                Type:
+                {" "}
+                {
+                  loggedBusiness.businessType
+                }
+              </p>
+
+            </div>
+
+          )
+        }
 
         <div
           style={{
             display: "grid",
+
             gridTemplateColumns:
               "1fr 1fr 1fr",
+
             gap: "30px"
           }}
         >
 
-          <div
-            style={cardStyle}
-          >
+          <div style={cardStyle}>
 
-            <h2
-              style={titleStyle}
-            >
-              AI Training
+            <h2 style={titleStyle}>
+              Train AI Employee
             </h2>
 
-            <div
-              style={formStyle}
-            >
+            <div style={formStyle}>
 
               <input
                 placeholder="Business Name"
+
                 value={businessName}
+
                 onChange={(e) =>
                   setBusinessName(
                     e.target.value
                   )
                 }
+
                 style={inputStyle}
               />
 
               <input
                 placeholder="Business Type"
+
                 value={businessType}
+
                 onChange={(e) =>
                   setBusinessType(
                     e.target.value
                   )
                 }
+
                 style={inputStyle}
               />
 
               <textarea
                 placeholder="Services"
+
                 value={services}
+
                 onChange={(e) =>
                   setServices(
                     e.target.value
                   )
                 }
+
                 style={textareaStyle}
               />
 
               <textarea
                 placeholder="Pricing"
+
                 value={pricing}
+
                 onChange={(e) =>
                   setPricing(
                     e.target.value
                   )
                 }
+
                 style={textareaStyle}
               />
 
               <textarea
                 placeholder="FAQ"
+
                 value={faq}
+
                 onChange={(e) =>
                   setFaq(
                     e.target.value
                   )
                 }
+
                 style={textareaStyle}
               />
 
               <button
                 style={buttonStyle}
+
                 onClick={
                   saveTraining
                 }
               >
-                Save AI Training
+                Activate AI Employee
               </button>
 
               {
+
                 message && (
+
                   <p
                     style={{
                       color:
@@ -289,6 +404,7 @@ export default function Home() {
                   >
                     {message}
                   </p>
+
                 )
               }
 
@@ -296,113 +412,108 @@ export default function Home() {
 
           </div>
 
-          <div
-            style={cardStyle}
-          >
+          <div style={cardStyle}>
 
-            <h2
-              style={titleStyle}
-            >
+            <h2 style={titleStyle}>
               Customer Leads
             </h2>
 
             <div
               style={{
                 display: "flex",
+
                 flexDirection:
                   "column",
+
                 gap: "15px"
               }}
             >
 
               {
+
                 leads.map(
                   (lead) => (
 
                     <div
                       key={lead.id}
+
                       style={leadBox}
                     >
 
                       <p>
-                        📞 {
-                          lead.phone
-                        }
+                        📞 {lead.phone}
                       </p>
 
                       <p>
-                        💬 {
-                          lead.message
-                        }
+                        💬 {lead.message}
                       </p>
 
                     </div>
                   )
                 )
+
               }
 
             </div>
 
           </div>
 
-          <div
-            style={cardStyle}
-          >
+          <div style={cardStyle}>
 
-            <h2
-              style={titleStyle}
-            >
+            <h2 style={titleStyle}>
               Hot Lead Alerts
             </h2>
 
             <div
               style={{
                 display: "flex",
+
                 flexDirection:
                   "column",
+
                 gap: "15px"
               }}
             >
 
               {
+
                 alerts.map(
                   (alert) => (
 
                     <div
                       key={alert.id}
+
                       style={{
                         background:
                           "rgba(239,68,68,0.15)",
+
                         padding:
                           "18px",
+
                         borderRadius:
                           "14px",
+
                         border:
                           "1px solid rgba(239,68,68,0.3)"
                       }}
                     >
 
                       <p>
-                        🚨 {
-                          alert.status
-                        }
+                        🚨 {alert.status}
                       </p>
 
                       <p>
-                        📞 {
-                          alert.phone
-                        }
+                        📞 {alert.phone}
                       </p>
 
                       <p>
-                        💬 {
-                          alert.message
-                        }
+                        💬 {alert.message}
                       </p>
 
                     </div>
                   )
                 )
+
               }
 
             </div>
@@ -418,67 +529,103 @@ export default function Home() {
 }
 
 const cardStyle = {
+
   background:
     "rgba(255,255,255,0.05)",
+
   border:
     "1px solid rgba(255,255,255,0.08)",
+
   borderRadius: "24px",
+
   padding: "30px",
+
   backdropFilter:
     "blur(12px)"
 };
 
 const titleStyle = {
+
   fontSize: "28px",
+
   marginBottom: "25px"
 };
 
 const formStyle = {
+
   display: "flex",
+
   flexDirection: "column",
+
   gap: "20px"
 };
 
 const inputStyle = {
+
   padding: "18px",
+
   borderRadius: "14px",
+
   border:
     "1px solid rgba(255,255,255,0.1)",
+
   background:
     "rgba(255,255,255,0.06)",
+
   color: "white",
+
   fontSize: "16px",
+
   outline: "none"
 };
 
 const textareaStyle = {
+
   minHeight: "120px",
+
   padding: "18px",
+
   borderRadius: "14px",
+
   border:
     "1px solid rgba(255,255,255,0.1)",
+
   background:
     "rgba(255,255,255,0.06)",
+
   color: "white",
+
   fontSize: "16px",
+
   outline: "none"
 };
 
 const buttonStyle = {
+
   padding: "18px",
+
   borderRadius: "14px",
+
   border: "none",
+
   background:
     "linear-gradient(to right, #2563eb, #7c3aed)",
+
   color: "white",
+
   fontSize: "18px",
+
   fontWeight: "bold",
+
   cursor: "pointer"
 };
 
 const leadBox = {
+
   background:
     "rgba(255,255,255,0.05)",
+
   padding: "18px",
+
   borderRadius: "14px"
 };
