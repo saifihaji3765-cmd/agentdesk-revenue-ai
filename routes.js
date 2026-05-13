@@ -22,6 +22,10 @@ const {
   loginBusiness
 } = require("./authController");
 
+const {
+  connectWhatsApp
+} = require("./whatsappController");
+
 const router = express.Router();
 
 router.get(
@@ -47,6 +51,11 @@ router.post(
 router.post(
   "/api/login",
   loginBusiness
+);
+
+router.post(
+  "/api/connect-whatsapp",
+  connectWhatsApp
 );
 
 router.get(
