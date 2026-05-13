@@ -1,21 +1,24 @@
 export const metadata = {
   title: "AgentDesk Revenue AI",
-  description: "AI Sales Employee SaaS Platform"
+  description:
+    "AI WhatsApp Employee SaaS"
 };
 
 export default function RootLayout({
   children
 }) {
+
   return (
+
     <html lang="en">
-      <body
-        style={{
-          margin: 0,
-          padding: 0
-        }}
-      >
+
+      <body>
+
         {children}
+
       </body>
+
     </html>
+
   );
 }
