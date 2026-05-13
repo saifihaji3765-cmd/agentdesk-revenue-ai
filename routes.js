@@ -10,11 +10,21 @@ const {
   saveTraining
 } = require("./trainingController");
 
+const {
+  getLeads
+} = require("./leadController");
+
 const router = express.Router();
 
-router.get("/api", getApiStatus);
+router.get(
+  "/api",
+  getApiStatus
+);
 
-router.get("/api/health", getHealthStatus);
+router.get(
+  "/api/health",
+  getHealthStatus
+);
 
 router.post(
   "/api/proposal",
@@ -24,6 +34,11 @@ router.post(
 router.post(
   "/api/training",
   saveTraining
+);
+
+router.get(
+  "/api/leads",
+  getLeads
 );
 
 module.exports = router;
