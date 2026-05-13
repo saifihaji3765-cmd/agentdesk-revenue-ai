@@ -93,11 +93,28 @@ client.on(
         content: message.body
       });
 
-      if (
-        message.body
-          .toLowerCase()
-          .includes("price")
-      ) {
+      const lowerMessage =
+        message.body.toLowerCase();
+
+      const triggerWords = [
+
+        "price",
+        "interested",
+        "buy",
+        "booking",
+        "appointment"
+
+      ];
+
+      const isHotLead =
+        triggerWords.some(
+          (word) =>
+            lowerMessage.includes(
+              word
+            )
+        );
+
+      if (isHotLead) {
 
         const rawLeads =
           fs.readFileSync(
@@ -128,6 +145,39 @@ client.on(
             2
           )
         );
+
+        const rawAlerts =
+          fs.readFileSync(
+            "alerts.json"
+          );
+
+        const alerts =
+          JSON.parse(rawAlerts);
+
+        alerts.push({
+
+          id: Date.now(),
+
+          phone:
+            message.from,
+
+          message:
+            message.body,
+
+          status:
+            "HOT LEAD"
+
+        });
+
+        fs.writeFileSync(
+          "alerts.json",
+
+          JSON.stringify(
+            alerts,
+            null,
+            2
+          )
+        );
       }
 
       const systemPrompt = `
@@ -148,11 +198,11 @@ ${business.pricing}
 FAQ:
 ${business.faq}
 
-Your goal:
+Your goals:
 - Reply professionally
 - Capture leads
-- Ask for customer details
-- Encourage conversion
+- Convert customers
+- Encourage booking
 `;
 
       const completion =
