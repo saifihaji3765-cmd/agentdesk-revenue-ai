@@ -5,11 +5,13 @@ const {
   "whatsapp-web.js"
 );
 
-const qrcode = require(
-  "qrcode-terminal"
+const QRCode = require(
+  "qrcode"
 );
 
 const clients = {};
+
+const qrCodes = {};
 
 const connectWhatsApp =
   async (req, res) => {
@@ -28,8 +30,11 @@ const connectWhatsApp =
 
           success: true,
 
+          qr:
+            qrCodes[businessId] || null,
+
           message:
-            "WhatsApp already connected"
+            "Session already exists"
 
         });
       }
@@ -50,17 +55,19 @@ const connectWhatsApp =
 
       client.on(
         "qr",
-        (qr) => {
+        async (qr) => {
 
-          qrcode.generate(
-            qr,
-            {
-              small: true
-            }
-          );
+          const qrImage =
+            await QRCode.toDataURL(
+              qr
+            );
+
+          qrCodes[
+            businessId
+          ] = qrImage;
 
           console.log(
-            `Scan QR for ${businessId}`
+            `QR Ready: ${businessId}`
           );
         }
       );
@@ -68,6 +75,10 @@ const connectWhatsApp =
       client.on(
         "ready",
         () => {
+
+          qrCodes[
+            businessId
+          ] = null;
 
           console.log(
             `WhatsApp Connected: ${businessId}`
@@ -77,14 +88,20 @@ const connectWhatsApp =
 
       client.initialize();
 
-      res.json({
+      setTimeout(() => {
 
-        success: true,
+        res.json({
 
-        message:
-          "WhatsApp session started. Scan QR in terminal."
+          success: true,
 
-      });
+          qr:
+            qrCodes[
+              businessId
+            ] || null
+
+        });
+
+      }, 4000);
 
     } catch (error) {
 
