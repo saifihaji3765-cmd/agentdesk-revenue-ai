@@ -25,6 +25,8 @@ const client = new Client({
 
 });
 
+const chatMemory = {};
+
 client.on(
   "qr",
   (qr) => {
@@ -76,8 +78,21 @@ client.on(
         );
       }
 
-      const prompt = `
-You are a professional AI employee for this business.
+      const userId =
+        message.from;
+
+      if (!chatMemory[userId]) {
+
+        chatMemory[userId] = [];
+      }
+
+      chatMemory[userId].push({
+        role: "user",
+        content: message.body
+      });
+
+      const systemPrompt = `
+You are a professional AI employee.
 
 Business Name:
 ${business.businessName}
@@ -94,9 +109,6 @@ ${business.pricing}
 FAQ:
 ${business.faq}
 
-Customer Message:
-${message.body}
-
 Reply professionally.
 `;
 
@@ -106,10 +118,14 @@ Reply professionally.
           model: "gpt-4.1-mini",
 
           messages: [
+
             {
-              role: "user",
-              content: prompt
-            }
+              role: "system",
+              content: systemPrompt
+            },
+
+            ...chatMemory[userId]
+
           ]
 
         });
@@ -117,6 +133,13 @@ Reply professionally.
       const aiReply =
         completion.choices[0]
         .message.content;
+
+      chatMemory[userId].push({
+
+        role: "assistant",
+        content: aiReply
+
+      });
 
       await message.reply(
         aiReply
