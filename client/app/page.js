@@ -41,11 +41,23 @@ export default function Home() {
 
   useEffect(() => {
 
-    fetchLeads();
+  fetchLeads();
 
-    fetchAlerts();
+  fetchAlerts();
 
-  }, []);
+  const interval =
+    setInterval(() => {
+
+      fetchLeads();
+
+      fetchAlerts();
+
+    }, 5000);
+
+  return () =>
+    clearInterval(interval);
+
+}, []);
 
   const fetchLeads =
     async () => {
