@@ -67,18 +67,21 @@ client.on(
           "data.json"
         );
 
-      const trainingData =
+      const database =
         JSON.parse(rawData);
 
       const business =
-        trainingData[0];
+        database.businesses[0];
 
       if (!business) {
 
         return message.reply(
-          "AI is not trained yet."
+          "AI not trained yet."
         );
       }
+
+      const businessId =
+        business.businessId;
 
       const userId =
         message.from;
@@ -89,8 +92,12 @@ client.on(
       }
 
       chatMemory[userId].push({
+
         role: "user",
-        content: message.body
+
+        content:
+          message.body
+
       });
 
       const lowerMessage =
@@ -121,12 +128,14 @@ client.on(
             "leads.json"
           );
 
-        const leads =
+        const leadDatabase =
           JSON.parse(rawLeads);
 
-        leads.push({
+        leadDatabase.leads.push({
 
           id: Date.now(),
+
+          businessId,
 
           phone:
             message.from,
@@ -137,13 +146,15 @@ client.on(
         });
 
         fs.writeFileSync(
+
           "leads.json",
 
           JSON.stringify(
-            leads,
+            leadDatabase,
             null,
             2
           )
+
         );
 
         const rawAlerts =
@@ -151,12 +162,14 @@ client.on(
             "alerts.json"
           );
 
-        const alerts =
+        const alertDatabase =
           JSON.parse(rawAlerts);
 
-        alerts.push({
+        alertDatabase.alerts.push({
 
           id: Date.now(),
+
+          businessId,
 
           phone:
             message.from,
@@ -170,13 +183,15 @@ client.on(
         });
 
         fs.writeFileSync(
+
           "alerts.json",
 
           JSON.stringify(
-            alerts,
+            alertDatabase,
             null,
             2
           )
+
         );
       }
 
@@ -198,23 +213,22 @@ ${business.pricing}
 FAQ:
 ${business.faq}
 
-Your goals:
-- Reply professionally
-- Capture leads
-- Convert customers
-- Encourage booking
+Reply professionally.
 `;
 
       const completion =
         await openai.chat.completions.create({
 
-          model: "gpt-4.1-mini",
+          model:
+            "gpt-4.1-mini",
 
           messages: [
 
             {
               role: "system",
-              content: systemPrompt
+
+              content:
+                systemPrompt
             },
 
             ...chatMemory[userId]
@@ -224,13 +238,17 @@ Your goals:
         });
 
       const aiReply =
-        completion.choices[0]
-        .message.content;
+        completion
+          .choices[0]
+          .message.content;
 
       chatMemory[userId].push({
 
-        role: "assistant",
-        content: aiReply
+        role:
+          "assistant",
+
+        content:
+          aiReply
 
       });
 
@@ -246,6 +264,7 @@ Your goals:
           true;
 
         setTimeout(
+
           async () => {
 
             try {
@@ -256,9 +275,7 @@ Your goals:
 
                 `Hello 👋
 
-Just checking if you are still interested.
-
-Let me know if you would like more details.`
+Just checking if you are still interested.`
 
               );
 
@@ -271,6 +288,7 @@ Let me know if you would like more details.`
           },
 
           7200000
+
         );
       }
 
