@@ -7,6 +7,9 @@ import {
 
 export default function Home() {
 
+  const API_URL =
+    "https://agentdesk-revenue-ai-8.onrender.com";
+
   const [
     businessName,
     setBusinessName
@@ -113,7 +116,7 @@ export default function Home() {
 
         const response =
           await fetch(
-            "https://agentdesk-revenue-ai.onrender.com/api/leads"
+            `${API_URL}/api/leads`
           );
 
         const data =
@@ -154,7 +157,7 @@ export default function Home() {
 
         const response =
           await fetch(
-            "https://agentdesk-revenue-ai.onrender.com/api/alerts"
+            `${API_URL}/api/alerts`
           );
 
         const data =
@@ -195,7 +198,7 @@ export default function Home() {
 
         const response =
           await fetch(
-            "https://agentdesk-revenue-ai.onrender.com/api/connect-whatsapp",
+            `${API_URL}/api/connect-whatsapp`,
             {
               method: "POST",
 
@@ -251,7 +254,7 @@ export default function Home() {
 
         const response =
           await fetch(
-            "https://agentdesk-revenue-ai.onrender.com/api/training",
+            `${API_URL}/api/training`,
             {
               method: "POST",
 
