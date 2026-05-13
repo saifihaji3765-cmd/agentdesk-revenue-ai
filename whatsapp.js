@@ -91,6 +91,43 @@ client.on(
         content: message.body
       });
 
+      if (
+        message.body
+          .toLowerCase()
+          .includes("price")
+      ) {
+
+        const rawLeads =
+          fs.readFileSync(
+            "leads.json"
+          );
+
+        const leads =
+          JSON.parse(rawLeads);
+
+        leads.push({
+
+          id: Date.now(),
+
+          phone:
+            message.from,
+
+          message:
+            message.body
+
+        });
+
+        fs.writeFileSync(
+          "leads.json",
+
+          JSON.stringify(
+            leads,
+            null,
+            2
+          )
+        );
+      }
+
       const systemPrompt = `
 You are a professional AI employee.
 
@@ -109,7 +146,11 @@ ${business.pricing}
 FAQ:
 ${business.faq}
 
-Reply professionally.
+Your goal:
+- Reply professionally
+- Capture leads
+- Ask for customer details
+- Encourage conversion
 `;
 
       const completion =
