@@ -61,9 +61,22 @@ export default function Home() {
 
     if (savedBusiness) {
 
+      const businessData =
+        JSON.parse(
+          savedBusiness
+        );
+
       setLoggedBusiness(
-        JSON.parse(savedBusiness)
+        businessData
       );
+    }
+
+  }, []);
+
+  useEffect(() => {
+
+    if (!loggedBusiness) {
+      return;
     }
 
     fetchLeads();
@@ -82,12 +95,16 @@ export default function Home() {
     return () =>
       clearInterval(interval);
 
-  }, []);
+  }, [loggedBusiness]);
 
   const fetchLeads =
     async () => {
 
       try {
+
+        if (!loggedBusiness) {
+          return;
+        }
 
         const response =
           await fetch(
@@ -99,8 +116,18 @@ export default function Home() {
 
         if (data.success) {
 
+          const filteredLeads =
+            data.leads.filter(
+
+              (lead) =>
+
+                lead.businessId ===
+                loggedBusiness.businessId
+
+            );
+
           setLeads(
-            data.leads
+            filteredLeads
           );
         }
 
@@ -116,6 +143,10 @@ export default function Home() {
 
       try {
 
+        if (!loggedBusiness) {
+          return;
+        }
+
         const response =
           await fetch(
             "https://agentdesk-revenue-ai.onrender.com/api/alerts"
@@ -126,8 +157,18 @@ export default function Home() {
 
         if (data.success) {
 
+          const filteredAlerts =
+            data.alerts.filter(
+
+              (alert) =>
+
+                alert.businessId ===
+                loggedBusiness.businessId
+
+            );
+
           setAlerts(
-            data.alerts
+            filteredAlerts
           );
         }
 
@@ -185,11 +226,13 @@ export default function Home() {
           );
 
           localStorage.setItem(
+
             "business",
 
             JSON.stringify(
               data.business
             )
+
           );
         }
 
@@ -244,8 +287,8 @@ export default function Home() {
             marginBottom: "40px"
           }}
         >
-          WhatsApp AI automation platform
-          for businesses.
+          WhatsApp AI automation
+          platform for businesses.
         </p>
 
         {
