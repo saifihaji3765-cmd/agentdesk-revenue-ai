@@ -3,12 +3,18 @@ const qrcode = require(
 );
 
 const {
-  Client
+  Client,
+  LocalAuth
 } = require(
   "whatsapp-web.js"
 );
 
-const client = new Client();
+const client = new Client({
+
+  authStrategy:
+    new LocalAuth()
+
+});
 
 client.on(
   "qr",
